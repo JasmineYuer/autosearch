@@ -1,3 +1,7 @@
 ignore
-test
+venv
+# test
 result
+upload_folder
+__pycache__
+.vscode

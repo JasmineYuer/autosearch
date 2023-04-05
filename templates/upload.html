@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>File Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+
+    <h1 class="bigh1"></h1>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        
+
+        <div class="box">
+        <h1 class="title">Upload word.txt</h1>
+        <input type="file" name="wordtxt">
+        <br><br>
+        <label>
+            <input type="radio" name="case" value="True" checked> Case Sensitive
+        </label>
+        <label>
+            <input type="radio" name="case" value="False"> Case Insensitive
+        </label>
+        <br><br>
+        <label>
+            <input type="radio" name="exact" value="True" checked> Match Exact Word
+        </label>
+        <label>
+            <input type="radio" name="exact" value="False"> Not Match Exact Word
+        </label>
+        <br><br>
+        <label for="above">Num of lines <em>above</em> searched: </label>
+        <input id="above" type="number" name="above" value="1" max="10" min="1" size="2" />
+
+        <br><br>
+        <label for="below">Num of lines <em>below</em> searched: </label>
+        <input id="below" type="number" name="below" value="1" max="10" min="1" size="2" />
+
+        </div>
+
+
+
+        <div class="box">
+        <h1 class="title">Upload link.txt</h1>
+        <input type="file" name="linktxt">
+        
+        <br> <br>
+        <label>
+            <input type="radio" name="deep_dive" value="True" > Search sublink
+        </label>
+        <label>
+            <input type="radio" name="deep_dive" value="False" checked> Not Search sublink
+        </label>
+        <br><br>
+        <label for="level">Number of levels to search:</label>
+        <input id="level" type="number" name="level" value="1" max="3" min="1" size="2" />
+        
+        <br><br>
+        <label for="stimeout">Deep Search Timeout: </label>
+        <input id="stimeout" type="number" name="stimeout" value="30"  min="30" size="3" />
+
+        </div>
+        <br>
+
+        <div class="submitdiv">
+        <input type="submit" value="Search!">
+
+        </div>
+
+    </form>
+
+    {% for message in get_flashed_messages() %}
+    <p style="color:red">{{ message }}</p>
+    {% endfor %}
+    {% if count %}
+    <div id="result">
+        <h3>Count: {{ count }}</h3>
+    </div>
+    {% endif %}
+</body>
+
+</html>

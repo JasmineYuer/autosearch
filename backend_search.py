@@ -8,7 +8,6 @@ import re
 from urllib.parse import urlparse, urljoin
 from threading import Lock, Thread
 from bs4 import BeautifulSoup
-import pandas as pd
 
 mutex = Lock()
 
@@ -31,12 +30,13 @@ def get_link_from_path(link_path):
 
 
 def get_word_from_path(word_path):
-	with open(word_path, "r", encoding="utf-8") as f:
-    	word = f.read()
-	word = list(
-	    set([i.replace("\xa0", " ").replace("\u202f", " ") for i in word.split("\n")])
-	)
-	return word
+    with open(word_path, "r", encoding="utf-8") as f:
+        word = f.read()
+
+    word = list(
+    set([i.replace("\xa0", " ").replace("\u202f", " ") for i in word.split("\n")])
+    )
+    return word
 
 def create_result_folder():
     try:
@@ -92,7 +92,7 @@ def url_deepdive(url, level, timeout=30):
                 fail_link.append(url)
                 mutex.release()
 
-    get_all_url(url, level)
+    get_all_url(url, level,timeout)
     s = time.time()
     for t in child_threads:
         t.join()
@@ -156,12 +156,23 @@ def lk_to_file(lk, file_name, file_lk_map, timeout):
     time.sleep(1)
 
 
-def write_to_files(link_lst, timeout=30):
+def write_to_files(link_lst, deep_dive = False, level =1, timeout=30):
     file_lk_map = {}
     fail_link = []
     child_threads = []
 
     create_result_folder()
+
+    if deep_dive:
+        final_link_lst = []
+        final_fail_link = []
+        for url in link_lst:
+            link_lst,fail_link = url_deepdive(url, level)
+            final_link_lst += link_lst
+            final_fail_link += fail_link
+
+        link_lst = final_link_lst.copy() 
+        fail_link = final_fail_link.copy() 
 
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]
@@ -226,10 +237,10 @@ def find_word_in_txt(
 #     return result
 
 
-def run_search(file_lk_map, above=2, below=2, ignore_case=True, exact_match=True):
+def run_search(file_lk_map,word_lst, above=2, below=2, ignore_case=True, exact_match=True):
     final = []
     for file, link in file_lk_map.items():
-        for w in word:
+        for w in word_lst:
             search = find_word_in_txt(
                 w,
                 file,
@@ -242,3 +253,5 @@ def run_search(file_lk_map, above=2, below=2, ignore_case=True, exact_match=True
                 pass
             else:
                 final.append([file, link, w, search])
+    df = pd.DataFrame(final,columns=['file','link','word','content'])
+    df.to_excel('./result/result.xlsx',sheet_name='search_result', index=False)
