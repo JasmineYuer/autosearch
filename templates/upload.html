@@ -74,10 +74,14 @@
     {% for message in get_flashed_messages() %}
     <p style="color:red">{{ message }}</p>
     {% endfor %}
-    {% if count %}
-    <div id="result">
-        <h3>Count: {{ count }}</h3>
-    </div>
+    <br>
+    {% if finish %}
+      <div id="result">
+        <h3>Finish searched!</h3>
+        <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
+          <button>Download File</button>
+        </a>
+      </div>
     {% endif %}
 </body>
 

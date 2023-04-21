@@ -1,16 +1,16 @@
+import re
+from urllib.parse import urlparse, urljoin
+from threading import Lock, Thread
 import os
 import shutil
 import time
 import pandas as pd
+import pandas as pd
 import requests
 import html2text
-import re
-from urllib.parse import urlparse, urljoin
-from threading import Lock, Thread
 from bs4 import BeautifulSoup
 
 mutex = Lock()
-
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
