@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 import backend_search as bs
 
 
-UPLOAD_FOLDER = "./upload_folder"
+UPLOAD_FOLDER = "./test"
 ALLOWED_EXTENSIONS = {"txt"}
 
 app = Flask(__name__)
@@ -52,7 +52,7 @@ def upload_file():
         if linktxt and allowed_file(linktxt.filename):
             filename = secure_filename(linktxt.filename)
             linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            link = bs.get_word_from_path(
+            link = bs.get_link_from_path(
                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
             )
 

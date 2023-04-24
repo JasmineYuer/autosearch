@@ -1,0 +1,38 @@
+from openpyxl import Workbook
+from openpyxl.styles import Alignment
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
+
+
+def df_to_xlsx(df, name):
+    wb = Workbook()
+    ws = wb.active
+    for r in dataframe_to_rows(df, index=False, header=True):
+        ws.append(r)
+    column_widths = []
+    first_row = True
+    for row in ws:
+        for i, cell in enumerate(row):
+            if first_row:
+                size = cell.font.size
+                cell.font = Font(bold=True, size=size + 3)
+            else:
+                pass
+            cell.alignment = Alignment(
+                wrapText=True, horizontal="left", vertical="center"
+            )
+            if len(column_widths) > i:
+                if len(cell.value) > column_widths[i]:
+                    column_widths[i] = len(cell.value)
+            else:
+                column_widths += [len(cell.value)]
+        first_row = False
+
+    # arbitrarily set to 500
+    column_widths[3] = 500
+
+    for i, column_width in enumerate(column_widths, 1):  # ,1 to start at 1
+        ws.column_dimensions[get_column_letter(i)].width = column_width
+
+    wb.save(name)

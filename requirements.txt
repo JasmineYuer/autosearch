@@ -4,3 +4,5 @@ html2text==2020.1.16
 beautifulsoup4==4.11.1
 requests==2.25.1
 openpyxl==3.0.10
+certifi==2022.12.7
+python-certifi-win32

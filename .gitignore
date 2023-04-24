@@ -6,3 +6,4 @@ upload_folder
 __pycache__
 .vscode
 *.ipynb
+*.xlsx

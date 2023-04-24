@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 import html2text
 from bs4 import BeautifulSoup
+import utils
 
 mutex = Lock()
 
@@ -17,16 +18,12 @@ headers = {
 }
 
 
-
-
 def get_link_from_path(link_path):
+    with open(link_path, "r", encoding="utf-8") as f:
+        link = f.read()
 
-	with open(link_path, "r",encoding="utf-8") as f:
-	    link = f.read()
-
-	link = [i.replace("\xa0", " ") for i in link.split("\n") if i != ""]
-	return link
-
+    link = [i.replace("\xa0", " ") for i in link.split("\n") if i != ""]
+    return link
 
 
 def get_word_from_path(word_path):
@@ -34,9 +31,10 @@ def get_word_from_path(word_path):
         word = f.read()
 
     word = list(
-    set([i.replace("\xa0", " ").replace("\u202f", " ") for i in word.split("\n")])
+        set([i.replace("\xa0", " ").replace("\u202f", " ") for i in word.split("\n")])
     )
     return word
+
 
 def create_result_folder():
     try:
@@ -62,7 +60,6 @@ def url_deepdive(url, level, timeout=30):
     print(f"Parsing {url}... Tracing {level} level down...")
 
     def get_all_url(url, level, timeout):
-
         if level == 0:
             return
         else:
@@ -92,7 +89,7 @@ def url_deepdive(url, level, timeout=30):
                 fail_link.append(url)
                 mutex.release()
 
-    get_all_url(url, level,timeout)
+    get_all_url(url, level, timeout)
     s = time.time()
     for t in child_threads:
         t.join()
@@ -102,7 +99,7 @@ def url_deepdive(url, level, timeout=30):
     return list(set(final_lst)), fail_link
 
 
-def lk_to_file(lk, file_name, file_lk_map, timeout):
+def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
     h = html2text.HTML2Text()
     h.ignore_links = True
     h.ignore_images = True
@@ -139,7 +136,6 @@ def lk_to_file(lk, file_name, file_lk_map, timeout):
         fail_link.append(lk)
         mutex.release()
     else:
-
         txt = r.text
         try:
             html_raw = h.handle(txt)
@@ -156,7 +152,7 @@ def lk_to_file(lk, file_name, file_lk_map, timeout):
     time.sleep(1)
 
 
-def write_to_files(link_lst, deep_dive = False, level =1, timeout=30):
+def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
     file_lk_map = {}
     fail_link = []
     child_threads = []
@@ -167,17 +163,19 @@ def write_to_files(link_lst, deep_dive = False, level =1, timeout=30):
         final_link_lst = []
         final_fail_link = []
         for url in link_lst:
-            link_lst,fail_link = url_deepdive(url, level)
+            link_lst, fail_link = url_deepdive(url, level)
             final_link_lst += link_lst
             final_fail_link += fail_link
 
-        link_lst = final_link_lst.copy() 
-        fail_link = final_fail_link.copy() 
+        link_lst = final_link_lst.copy()
+        fail_link = final_fail_link.copy()
 
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]
         file_name = f"./result/{index}.txt"
-        t = Thread(target=lk_to_file, args=([lk, file_name, file_lk_map, timeout]))
+        t = Thread(
+            target=lk_to_file, args=([lk, fail_link, file_name, file_lk_map, timeout])
+        )
         t.start()
         # check if the link is not a html
         child_threads.append(t)
@@ -190,7 +188,6 @@ def write_to_files(link_lst, deep_dive = False, level =1, timeout=30):
 def find_word_in_txt(
     word, file_name, above=1, below=1, ignore_case=True, exact_match=True
 ):
-
     with open(file_name, "r", encoding="utf-8") as f:
         txt = f.read()
 
@@ -237,7 +234,9 @@ def find_word_in_txt(
 #     return result
 
 
-def run_search(file_lk_map,word_lst, above=2, below=2, ignore_case=True, exact_match=True):
+def run_search(
+    file_lk_map, word_lst, above=2, below=2, ignore_case=True, exact_match=True
+):
     final = []
     for file, link in file_lk_map.items():
         for w in word_lst:
@@ -253,5 +252,6 @@ def run_search(file_lk_map,word_lst, above=2, below=2, ignore_case=True, exact_m
                 pass
             else:
                 final.append([file, link, w, search])
-    df = pd.DataFrame(final,columns=['file','link','word','content'])
-    df.to_excel('./result/result.xlsx',sheet_name='search_result', index=False)
+    df = pd.DataFrame(final, columns=["file", "link", "word", "content"])
+    utils.df_to_xlsx(df, "./result/result.xlsx")
+    # df.to_excel("./result/result.xlsx", sheet_name="search_result", index=False)
