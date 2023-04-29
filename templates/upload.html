@@ -1,88 +1,96 @@
 <!doctype html>
 <html>
-
-<head>
+  <head>
     <title>File Upload</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/main.css') }}">
+  </head>
+  <body>
+    <div class="w-screen h-screen flex justify-center items-center">
+      {% for message in get_flashed_messages() %}
+        <p class="border-red-700 bg-red-600 rounded-md text-white text-sm">{{ message }}</p>
+      {% endfor %}
 
-<body>
-
-
-    <h1 class="bigh1"></h1>
-    <form action="/" method="POST" enctype="multipart/form-data">
-        
-
-        <div class="box">
-        <h1 class="title">Upload word.txt</h1>
-        <input type="file" name="wordtxt">
-        <br><br>
-        <label>
-            <input type="radio" name="case" value="True" checked> Case Sensitive
-        </label>
-        <label>
-            <input type="radio" name="case" value="False"> Case Insensitive
-        </label>
-        <br><br>
-        <label>
-            <input type="radio" name="exact" value="True" checked> Match Exact Word
-        </label>
-        <label>
-            <input type="radio" name="exact" value="False"> Not Match Exact Word
-        </label>
-        <br><br>
-        <label for="above">Num of lines <em>above</em> searched: </label>
-        <input id="above" type="number" name="above" value="1" max="10" min="1" size="2" />
-
-        <br><br>
-        <label for="below">Num of lines <em>below</em> searched: </label>
-        <input id="below" type="number" name="below" value="1" max="10" min="1" size="2" />
-
+      {% if finish %}
+        <div class="w-full flex flex-col justify-center items-center gap-y-8">
+          <h2 class="text-2xl font-semibold text-gray-900">Search finished!</h2>
+          <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
+            <button type="submit" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-md font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Download File</button>
+          </a>
         </div>
+      {% else %}
+        <form class="w-full flex flex-col justify-center items-center gap-y-12" action="/" method="POST" enctype="multipart/form-data">
+          <div class="flex justify-center gap-x-20">
+            <div class="border border-gray-500 rounded-lg p-8">
+              <h1 class="text-2xl font-semibold text-cyan-700">Upload word.txt</h1>
+              <fieldset class="flex flex-col gap-y-6 mt-8">
+                <legend class="sr-only">Word.txt</legend>
+                <div>
+                  <input type="file" name="wordtxt" class="text-sm font-medium leading-6 text-gray-900">
+                </div>
+                <div class="flex">
+                  <div class="flex items-center w-1/2">
+                    <input id="case-true" type="radio" name="case" value="True" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="case-true" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Case Sensitive</label>
+                  </div>
+                  <div class="flex items-center w-1/2">
+                    <input id="case-false" type="radio" name="case" value="False" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="case-false" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Case Insensitive</label>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div class="flex items-center w-1/2">
+                    <input id="exactmatch-true" type="radio" name="exact" value="True" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="exactmatch-true" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Full Match</label>
+                  </div>
+                  <div class="flex items-center w-1/2">
+                    <input id="exactmatch-false" type="radio" name="exact" value="False" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="exactmatch-false" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Partial Match</label>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label for="above" class="block text-sm font-medium leading-6 text-gray-900">Num of lines above search</label>
+                  <input id="above" type="number" name="above" value="1" max="10" min="1" size="2" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+                <div class="space-y-2">
+                  <label for="below" class="block text-sm font-medium leading-6 text-gray-900">Num of lines below search</label>
+                  <input id="below" type="number" name="below" value="1" max="10" min="1" size="2" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+              </fieldset>
+            </div>
+            <div class="border border-gray-500 rounded-lg p-8">
+              <h1 class="text-2xl font-semibold text-cyan-700">Upload link.txt</h1>
+              <fieldset class="flex flex-col gap-y-6 mt-8">
+                <legend class="sr-only">Link.txt</legend>
+                <div>
+                    <input type="file" name="linktxt" class="text-sm font-medium leading-6 text-gray-900">
+                </div>
+                <div class="flex">
+                  <div class="flex items-center w-1/2">
+                    <input id="deepdive-true" type="radio" name="deep_dive" value="True" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="deepdive-true" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Deep Search</label>
+                  </div>
+                  <div class="flex items-center w-1/2">
+                    <input id="deepdive-false" type="radio" name="deep_dive" value="False" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                    <label for="deepdive-false" class="ml-2 block text-sm font-medium leading-6 text-gray-900">Shallow Search</label>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <label for="level" class="block text-sm font-medium leading-6 text-gray-900">Num of levels to search</label>
+                  <input id="level" type="number" name="level" value="1" max="3" min="1" size="2" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+                <div class="space-y-2">
+                  <label for="stimeout" class="block text-sm font-medium leading-6 text-gray-900">Deep search timeout</label>
+                  <input id="stimeout" type="number" name="stimeout" value="30" min="30" size="3" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+          <div>
+            <button type="submit" class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Search!</button>
+          </div>
+        </form>
+      {% endif %}
 
-
-
-        <div class="box">
-        <h1 class="title">Upload link.txt</h1>
-        <input type="file" name="linktxt">
-        
-        <br> <br>
-        <label>
-            <input type="radio" name="deep_dive" value="True" > Search sublink
-        </label>
-        <label>
-            <input type="radio" name="deep_dive" value="False" checked> Not Search sublink
-        </label>
-        <br><br>
-        <label for="level">Number of levels to search:</label>
-        <input id="level" type="number" name="level" value="1" max="3" min="1" size="2" />
-        
-        <br><br>
-        <label for="stimeout">Deep Search Timeout: </label>
-        <input id="stimeout" type="number" name="stimeout" value="30"  min="30" size="3" />
-
-        </div>
-        <br>
-
-        <div class="submitdiv">
-        <input type="submit" value="Search!">
-
-        </div>
-
-    </form>
-
-    {% for message in get_flashed_messages() %}
-    <p style="color:red">{{ message }}</p>
-    {% endfor %}
-    <br>
-    {% if finish %}
-      <div id="result">
-        <h3>Finish searched!</h3>
-        <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
-          <button>Download File</button>
-        </a>
-      </div>
-    {% endif %}
-</body>
-
+    </div>
+  </body>
 </html>
