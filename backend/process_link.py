@@ -1,15 +1,13 @@
-import re
 from urllib.parse import urlparse, urljoin
 from threading import Lock, Thread
 import os
 import shutil
 import time
-import pandas as pd
-import pandas as pd
 import requests
 import html2text
 from bs4 import BeautifulSoup
-import utils
+from backend import utils
+from backend.pdf import process_pdf
 
 mutex = Lock()
 
@@ -25,16 +23,6 @@ def get_link_from_path(link_path):
 
     link = [i.replace("\xa0", " ") for i in link.split("\n") if i != ""]
     return link
-
-
-def get_word_from_path(word_path):
-    with open(word_path, "r", encoding="utf-8") as f:
-        word = f.read()
-
-    word = list(
-        set([i.replace("\xa0", " ").replace("\u202f", " ") for i in word.split("\n")])
-    )
-    return word
 
 
 def create_result_folder():
@@ -106,9 +94,22 @@ def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
     h.ignore_images = True
 
     if lk.lower().endswith(".pdf"):
-         
+        txt = process_pdf(lk)
+        if txt:
+            with open(file_name, "w", encoding="utf-8") as f:
+                f.write(txt)
+            mutex.acquire()
+            file_lk_map[file_name] = lk
+            mutex.release()
+            return
+        else:
+            mutex.acquire()
+            fail_link.append(lk)
+            mutex.release()
+            return
+
     if (
-        or lk.lower().endswith(".png")
+        lk.lower().endswith(".png")
         or lk.lower().endswith(".jpk")
         or lk.lower().endswith(".img")
         or lk.lower().endswith(".png")
@@ -186,75 +187,3 @@ def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
     for t in child_threads:
         t.join()
     return file_lk_map, fail_link
-
-
-def find_word_in_txt(
-    word, file_name, above=1, below=1, ignore_case=True, exact_match=True
-):
-    with open(file_name, "r", encoding="utf-8") as f:
-        txt = f.read()
-
-    if exact_match:
-        p = f"\\b{word}\\b"
-    else:
-        p = word
-    if ignore_case:
-        pattern = re.compile(p, re.IGNORECASE)
-    else:
-        pattern = re.compile(p)
-
-    line_idx = []
-    for i, line in enumerate(txt.splitlines()):
-        if re.search(pattern, line):
-            if i == 0:
-                start = 0
-                end = below + 1
-            elif i == len(txt.splitlines()) - 1:
-                start = start = max(i - above, 0)
-                end = len(txt.splitlines()) - 1
-            else:
-                start = max(i - above, 0)
-                end = min(i + below + 1, len(txt.splitlines()) - 1)
-            line_idx += list(range(start, end))
-    line_idx = list(set(line_idx))
-    final = ""
-    for idx in range(len(line_idx)):
-        if idx == 0:
-            pre = 0
-        else:
-            pre = line_idx[idx - 1]
-
-        cur = line_idx[idx]
-
-        if cur - pre > 1:
-            final += "\n\n\n"
-
-        final += txt.splitlines()[cur] + "\n"
-
-    return final
-
-
-#     return result
-
-
-def run_search(
-    file_lk_map, word_lst, above=2, below=2, ignore_case=True, exact_match=True
-):
-    final = []
-    for file, link in file_lk_map.items():
-        for w in word_lst:
-            search = find_word_in_txt(
-                w,
-                file,
-                above=above,
-                below=below,
-                ignore_case=ignore_case,
-                exact_match=exact_match,
-            )
-            if search == "":
-                pass
-            else:
-                final.append([file, link, w, search])
-    df = pd.DataFrame(final, columns=["file", "link", "word", "content"])
-    utils.df_to_xlsx(df, "./result/result.xlsx")
-    # df.to_excel("./result/result.xlsx", sheet_name="search_result", index=False)

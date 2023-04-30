@@ -9,8 +9,8 @@ from flask import (
     send_from_directory,
 )
 from werkzeug.utils import secure_filename
-import backend_search as bs
-
+from backend import process_link as pl
+from backend import process_word as pw
 
 UPLOAD_FOLDER = "./test"
 ALLOWED_EXTENSIONS = {"txt"}
@@ -45,22 +45,22 @@ def upload_file():
         if wordtxt and allowed_file(wordtxt.filename):
             filename = secure_filename(wordtxt.filename)
             wordtxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            word = bs.get_word_from_path(
+            word = pw.get_word_from_path(
                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
             )
 
         if linktxt and allowed_file(linktxt.filename):
             filename = secure_filename(linktxt.filename)
             linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            link = bs.get_link_from_path(
+            link = pl.get_link_from_path(
                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
             )
 
-        file_lk_map, fail_lst = bs.write_to_files(
+        file_lk_map, fail_lst = pl.write_to_files(
             link, deep_dive=False, level=level, timeout=stimeout
         )
         print("finish parse")
-        bs.run_search(
+        pw.run_search(
             file_lk_map,
             word,
             above=above,
