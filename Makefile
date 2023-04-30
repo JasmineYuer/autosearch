@@ -107,3 +107,7 @@ jlist:
 
 jremove:
 	jupyter kernelspec remove -f ${venv}
+
+start:
+	source venv/Scripts/activate
+	python app.py
