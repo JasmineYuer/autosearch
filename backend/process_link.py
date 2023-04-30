@@ -41,53 +41,6 @@ def find_base_url(url):
     return o.scheme + "://" + o.netloc
 
 
-def url_deepdive(url, level, timeout=30):
-    base_url = find_base_url(url)
-    final_lst = []
-    child_threads = []
-    fail_link = []
-    print(f"Parsing {url}... Tracing {level} level down...")
-
-    def get_all_url(url, level, timeout):
-        if level == 0:
-            return
-        else:
-            level -= 1
-            try:
-                r = requests.get(url, headers=headers, timeout=timeout)
-                soup = BeautifulSoup(r.content, "html.parser")
-                s = soup.find_all("a")
-                for i in s:
-                    ref = i.get("href")
-                    ref = ref.strip()
-                    if ref is not None:
-                        # not parse external link and referral link
-                        if "http" not in ref and not ref.startswith("#"):
-                            mutex.acquire()
-                            final_lst.append(urljoin(base_url, ref))
-                            mutex.release()
-                            t = Thread(
-                                target=get_all_url,
-                                args=([urljoin(base_url, ref), level]),
-                            )
-                            t.start()
-                            child_threads.append(t)
-
-            except:
-                mutex.acquire()
-                fail_link.append(url)
-                mutex.release()
-
-    get_all_url(url, level, timeout)
-    s = time.time()
-    for t in child_threads:
-        t.join()
-    print(
-        f"Visited {len(final_lst)} links, grabbed {len(list(set(final_lst)))} unique links in {round(time.time()-s,2)} seconds"
-    )
-    return list(set(final_lst)), fail_link
-
-
 def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
     h = html2text.HTML2Text()
     h.ignore_links = True
@@ -162,17 +115,6 @@ def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
     child_threads = []
 
     create_result_folder()
-
-    # if deep_dive:
-    #     final_link_lst = []
-    #     final_fail_link = []
-    #     for url in link_lst:
-    #         link_lst, fail_link = url_deepdive(url, level)
-    #         final_link_lst += link_lst
-    #         final_fail_link += fail_link
-
-    #     link_lst = final_link_lst.copy()
-    #     fail_link = final_fail_link.copy()
 
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]
