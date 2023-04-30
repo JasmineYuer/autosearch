@@ -41,7 +41,7 @@ def find_base_url(url):
     return o.scheme + "://" + o.netloc
 
 
-def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
+def lk_to_file(lk, fail_map, file_name, file_lk_map, timeout):
     h = html2text.HTML2Text()
     h.ignore_links = True
     h.ignore_images = True
@@ -56,8 +56,9 @@ def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
             mutex.release()
             return
         else:
+            print("PDF fail to grab due to block")
             mutex.acquire()
-            fail_link.append(lk)
+            fail_map[lk] = "PDF fail to grab due to block"
             mutex.release()
             return
 
@@ -70,27 +71,29 @@ def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
         or lk.lower().endswith(".docx")
         or lk.lower().endswith(".csv")
     ):
-        print(f"Can't parse None HTML content, link is {lk}\n")
+        print(f"Can't parse None HTML/PDF content")
         mutex.acquire()
-        fail_link.append(lk)
+        fail_map[lk] = f"Can't parse None HTML/PDF content"
         mutex.release()
         return
     # check time out
     try:
         r = requests.get(lk, headers=headers, timeout=timeout)
     except (requests.exceptions.RequestException, ValueError) as e:
+        # try timeout first
+
         print(f"Link {lk} time out in {timeout} seconds")
         mutex.acquire()
-        fail_link.append(lk)
+        fail_map[lk] = f"Time out in {timeout} seconds"
         mutex.release()
         return
 
     if r.status_code != 200:
         print(
-            f"Fail to parse {lk}, status code is {r.status_code}\n, forbidden to request"
+            f"Fail to parse {lk}, status code is {r.status_code}, forbidden to request"
         )
         mutex.acquire()
-        fail_link.append(lk)
+        fail_map[lk] = f"Status code is {r.status_code}, forbidden to request"
         mutex.release()
     else:
         txt = r.text
@@ -111,7 +114,7 @@ def lk_to_file(lk, fail_link, file_name, file_lk_map, timeout):
 
 def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
     file_lk_map = {}
-    fail_link = []
+    fail_map = {}
     child_threads = []
 
     create_result_folder()
@@ -120,7 +123,7 @@ def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
         lk = link_lst[index - 1]
         file_name = f"./result/{index}.txt"
         t = Thread(
-            target=lk_to_file, args=([lk, fail_link, file_name, file_lk_map, timeout])
+            target=lk_to_file, args=([lk, fail_map, file_name, file_lk_map, timeout])
         )
         t.start()
         # check if the link is not a html
@@ -128,4 +131,4 @@ def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
 
     for t in child_threads:
         t.join()
-    return file_lk_map, fail_link
+    return file_lk_map, fail_map
