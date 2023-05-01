@@ -1,7 +1,6 @@
 import re
 from threading import Lock, Thread
 import time
-import pandas as pd
 from backend import utils
 
 mutex = Lock()
@@ -69,7 +68,9 @@ def run_search(
     file_lk_map, word_lst, above=2, below=2, ignore_case=True, exact_match=True
 ):
     final = []
+    lk_no_hit = []
     for file, link in file_lk_map.items():
+        found = False
         for w in word_lst:
             search = find_word_in_txt(
                 w,
@@ -82,8 +83,10 @@ def run_search(
             if search == "":
                 pass
             else:
-                final.append([file, link, w, search])
+                found = True
+                final.append([link, w, search])
         print(file, "finished!")
-    df = pd.DataFrame(final, columns=["file", "link", "word", "content"])
-    utils.df_to_xlsx(df, "./result/result.xlsx")
-    # df.to_excel("./result/result.xlsx", sheet_name="search_result", index=False)
+
+        if not found:
+            lk_no_hit.append(link)
+    return final, lk_no_hit

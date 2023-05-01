@@ -12,7 +12,7 @@ def download_pdf(url):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
         "referer": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     if response.status_code == 200:
         return BytesIO(response.content)
     else:

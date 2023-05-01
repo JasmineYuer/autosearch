@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from flask import (
     Flask,
     request,
@@ -11,6 +12,7 @@ from flask import (
 from werkzeug.utils import secure_filename
 from backend import process_link as pl
 from backend import process_word as pw
+from backend import utils
 
 UPLOAD_FOLDER = "./test"
 ALLOWED_EXTENSIONS = {"txt"}
@@ -56,11 +58,11 @@ def upload_file():
                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
             )
 
-        file_lk_map, fail_lst = pl.write_to_files(
+        file_lk_map, fail_map = pl.write_to_files(
             link, deep_dive=False, level=level, timeout=stimeout
         )
         print("finish parse")
-        pw.run_search(
+        final, lk_no_hit = pw.run_search(
             file_lk_map,
             word,
             above=above,
@@ -68,6 +70,24 @@ def upload_file():
             ignore_case=case,
             exact_match=exact,
         )
+
+        df = pd.DataFrame(final, columns=["link", "word", "content"])
+        utils.df_to_xlsx(df, "./result/result.xlsx")
+
+        summary = []
+        for l in link:
+            if l in fail_map:
+                summary.append([l, fail_map[l]])
+            elif l in lk_no_hit:
+                summary.append([l, "no hit"])
+            else:
+                summary.append([l, "hit"])
+        summary = pd.DataFrame(summary, columns=["Link", "Result"])
+        with pd.ExcelWriter(
+            "./result/result.xlsx", engine="openpyxl", mode="a"
+        ) as writer:
+            summary.to_excel(writer, sheet_name="summary")
+
         filename = "result.xlsx"
         finish = True
         return render_template("upload.html", finish=finish, filename=filename)

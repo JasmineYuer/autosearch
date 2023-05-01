@@ -8,6 +8,7 @@ from openpyxl.utils import get_column_letter
 def df_to_xlsx(df, name):
     wb = Workbook()
     ws = wb.active
+    ws.title = "search_result"
     for r in dataframe_to_rows(df, index=False, header=True):
         ws.append(r)
     column_widths = []
@@ -30,7 +31,7 @@ def df_to_xlsx(df, name):
         first_row = False
 
     # arbitrarily set to 500
-    column_widths[3] = 500
+    column_widths[2] = 500
 
     for i, column_width in enumerate(column_widths, 1):  # ,1 to start at 1
         ws.column_dimensions[get_column_letter(i)].width = column_width
