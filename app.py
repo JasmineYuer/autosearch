@@ -58,9 +58,7 @@ def allowed_file(filename):
 #                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
 #             )
 
-#         file_lk_map, fail_map = pl.write_to_files(
-#             link, deep_dive=False, level=level, timeout=stimeout
-#         )
+#         file_lk_map, fail_map = pl.write_to_files(link, timeout=stimeout)
 #         print("finish parse")
 #         final, lk_no_hit = pw.run_search(
 #             file_lk_map,
@@ -105,6 +103,7 @@ def link_to_text():
         #     linkarea == ""
         # ) == 1, "Either upload or put some text"
 
+        print(linktxt, linkarea, stimeout)
         if linktxt and allowed_file(linktxt.filename):
             filename = secure_filename(linktxt.filename)
             linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
@@ -117,7 +116,7 @@ def link_to_text():
         file_lk_map, fail_map = pl.write_to_files(link, timeout=stimeout)
         utils.zip_files()
         filename = "link_result.zip"
-        print("finish parse")
+        print("finish parse", file_lk_map)
         finish = True
         return render_template("link.html", finish=finish, filename=filename)
 
@@ -126,13 +125,14 @@ def link_to_text():
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
+    print(os.path.join("result", filename))
     return send_from_directory("./result", filename)
 
 
 @app.route("/search_word")
 def search_word():
-    return "hello"
+    return "hello world"
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

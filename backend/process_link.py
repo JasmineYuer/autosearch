@@ -117,7 +117,6 @@ def write_to_files(link_lst, timeout=30):
     child_threads = []
 
     utils.create_result_folder()
-
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]
         file_name = f"./result/{index}.txt"

@@ -55,11 +55,13 @@
         <h3>Finish searched!</h3>
       <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
      
-          <button>Download Text</button>
+          <button type = "button">Download Text</button>
         </a>
         <p>or</p>
 
-
+      <a href="{{ url_for('search_word') }}">
+      <button type = "button">Search word</button>
+      </a>
       </div>
     {% endif %}
 </body>

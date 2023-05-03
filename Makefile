@@ -111,3 +111,6 @@ jremove:
 start:
 	source venv/Scripts/activate
 	python app.py
+start_debug:
+	source venv/Scripts/activate
+	flask --app app run --debug
