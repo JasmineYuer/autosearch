@@ -10,7 +10,10 @@ def df_to_xlsx(df, name):
     ws = wb.active
     ws.title = "search_result"
     for r in dataframe_to_rows(df, index=False, header=True):
-        ws.append(r)
+        try:
+            ws.append(r)
+        except:
+            print("jump", r[0])
     column_widths = []
     first_row = True
     for row in ws:
