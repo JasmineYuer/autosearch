@@ -1,12 +1,14 @@
+
 body {
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 800vh;
 }
 
 .box {
-    display: inline-block;
-    height: 300px;
+
+    height: 500px;
     width: 400px;
     margin: 20px;
     vertical-align: bottom;

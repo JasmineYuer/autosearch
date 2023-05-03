@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>File Upload</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+
+<body>
+
+
+    
+
+    <form action="/" method="POST" enctype="multipart/form-data">
+        
+
+        <div class="box">
+        <h1 class="bigh1"></h1>
+
+
+        <h1 class="title">Upload link.txt</h1>
+
+        <input type="file" name="linktxt">
+        
+        <br> <br>
+        <label>
+            <input type="radio" name="deep_dive" value="True" > Search sublink
+        </label>
+        <label>
+            <input type="radio" name="deep_dive" value="False" checked> Not Search sublink
+        </label>
+        
+        <br><br>
+        <label for="stimeout">Search Timeout: </label>
+        <input id="stimeout" type="number" name="stimeout" value="15"  min="10" size="3" />
+
+        </div>
+        <br>
+
+        <div class="submitdiv">
+        <input type="submit" value="Search!">
+
+        </div>
+
+    </form>
+
+<!--     {% for message in get_flashed_messages() %}
+    <p style="color:red">{{ message }}</p>
+    {% endfor %}
+    <br>
+    {% if finish %}
+      <div id="result">
+        <h3>Finish searched!</h3>
+        <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
+          <button>Download File</button>
+        </a>
+      </div>
+    {% endif %} -->
+</body>
+
+</html>
