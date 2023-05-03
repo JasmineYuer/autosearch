@@ -5,7 +5,6 @@ import shutil
 import time
 import requests
 import html2text
-from bs4 import BeautifulSoup
 from backend import utils
 from backend.pdf import process_pdf
 
@@ -112,12 +111,12 @@ def lk_to_file(lk, fail_map, file_name, file_lk_map, timeout):
     time.sleep(1)
 
 
-def write_to_files(link_lst, deep_dive=False, level=1, timeout=30):
+def write_to_files(link_lst, timeout=30):
     file_lk_map = {}
     fail_map = {}
     child_threads = []
 
-    create_result_folder()
+    utils.create_result_folder()
 
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]

@@ -15,47 +15,53 @@
         
 
         <div class="box">
-        <h1 class="bigh1"></h1>
+     
 
-
-        <h1 class="title">Upload link.txt</h1>
-
-        <input type="file" name="linktxt">
-        
-        <br> <br>
-        <label>
-            <input type="radio" name="deep_dive" value="True" > Search sublink
-        </label>
-        <label>
-            <input type="radio" name="deep_dive" value="False" checked> Not Search sublink
-        </label>
-        
+        <h1 class="title">Provide links to search</h1>
+        <p> Choose one of the following:
+        <br>
+        1. clicking choose file to upload link.txt 
+        <br>
+        2. Directly paste link in text area,split by new line </p>
+        <label for="linktxt"><b>Upload Link here:<b> </label>
+        <br>
+        <input type="file" name="linktxt">       
+        <br><br>
+        <label for="linkarea"> <b>Or Paste Link here:</b> </label>
+        <br><br>
+        <textarea name="linkarea" id="linkarea" cols="50" rows="10"></textarea>
         <br><br>
         <label for="stimeout">Search Timeout: </label>
-        <input id="stimeout" type="number" name="stimeout" value="15"  min="10" size="3" />
+        <input id="stimeout" type="number" name="stimeout" value="15"  min="10" max="30" />
 
         </div>
-        <br>
-
+        
+        {% if not finish %}
         <div class="submitdiv">
         <input type="submit" value="Search!">
-
         </div>
+        {% endif %}
+
+
 
     </form>
 
-<!--     {% for message in get_flashed_messages() %}
+    {% for message in get_flashed_messages() %}
     <p style="color:red">{{ message }}</p>
     {% endfor %}
     <br>
     {% if finish %}
       <div id="result">
         <h3>Finish searched!</h3>
-        <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
-          <button>Download File</button>
+      <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
+     
+          <button>Download Text</button>
         </a>
+        <p>or</p>
+
+
       </div>
-    {% endif %} -->
+    {% endif %}
 </body>
 
 </html>

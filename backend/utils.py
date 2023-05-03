@@ -3,7 +3,7 @@ from openpyxl.styles import Alignment
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-
+import os,zipfile,shutil
 
 def df_to_xlsx(df, name):
     wb = Workbook()
@@ -37,3 +37,25 @@ def df_to_xlsx(df, name):
         ws.column_dimensions[get_column_letter(i)].width = column_width
 
     wb.save(name)
+
+
+
+def create_result_folder():
+    try:
+        os.mkdir("result")
+        print("Current dir in : " + os.getcwd())
+    except:
+        shutil.rmtree("result")
+        print("Result folder exist, removed existing result folder")
+        os.mkdir("result")
+        print("Created result folder")
+
+
+
+def zip_files():
+    with zipfile.ZipFile("./result/link_result.zip", "w") as zf:
+        for file in os.listdir("result"):
+            if file.endswith(".txt"):
+                path = os.path.join("result",file)
+                zf.write(path)
+
