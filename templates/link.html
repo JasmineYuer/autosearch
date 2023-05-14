@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>File Upload</title>
+    <title>Search Link</title>
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 
@@ -36,12 +36,9 @@
 
         </div>
         
-        {% if not finish %}
         <div class="submitdiv">
         <input type="submit" value="Search!">
         </div>
-        {% endif %}
-
 
 
     </form>
@@ -50,20 +47,7 @@
     <p style="color:red">{{ message }}</p>
     {% endfor %}
     <br>
-    {% if finish %}
-      <div id="result">
-        <h3>Finish searched!</h3>
-      <a href="{{ url_for('uploaded_file', filename=filename) }}" download="{{ filename }}">
-     
-          <button type = "button">Download Text</button>
-        </a>
-        <p>or</p>
 
-      <a href="{{ url_for('search_word') }}">
-      <button type = "button">Search word</button>
-      </a>
-      </div>
-    {% endif %}
 </body>
 
 </html>

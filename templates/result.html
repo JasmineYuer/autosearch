@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Result</title>
+    <link rel="stylesheet" href="../static/styles.css">
+  </head>
+  <body>
+    <br>
+    {%if 'link'== source %}
+    <div id="result">
+      <h3>Finish grabbing text from links!</h3>
+      <a href="{{ url_for('download_file', filename=filename['link']) }}" download="{{ filename['link'] }}">
+        <button type = "button">Download Text</button>
+      </a>
+      <p>or</p>
+      <button type = "button"><a href="{{ url_for('search_word') }}">Proceed to Search Word</a></button>
+      <p>or</p>
+      <button type = "button"><a href="{{ url_for('link_to_text') }}">Back to Search Link</a></button>
+    </div>
+  {% else %}
+    <div id="result">
+      <h3>Finish searching keyword!</h3>
+      <a href="{{ url_for('download_file', filename=filename['link']) }}" download="{{ filename['link'] }}">
+        <button type = "button">Download Text From Search Link</button>
+      </a>
+      <p>or</p>
+      <a href="{{ url_for('download_file', filename=filename['result']) }}" download="{{ filename['result'] }}">
+        <button type="button">Download Result From Search Word</button>
+      </a>
+      <p>or</p>
+      <button type="button"><a href="{{ url_for('link_to_text') }}">Back to Search Link</a></button>
+      <p>or</p>
+      <button type="button"><a href="{{ url_for('search_word') }}">Back to Search Word</a></button>
+    </div>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Search Word</title>
+        <link rel="stylesheet" href="../static/styles.css">
+    </head>
+    <body>
+        
+        <form action="/search_word" method="POST" enctype="multipart/form-data">
+            
+            <div class="box">
+                
+                <h1 class="title">Provide Word to search</h1>
+                <p> Choose one of the following:
+                    <br>
+                    1. clicking choose file to upload word.txt
+                    <br>
+                2. Directly paste words in text area,split by new line </p>
+                <label for="wordtxt"><b>Upload word.txt here:<b> </label>
+                <br>
+                <input type="file" name="wordtxt">
+                <br><br>
+                <label for="wordarea"> <b>Or Paste Words here:</b> </label>
+                <br><br>
+                <textarea name="wordarea" id="wordarea" cols="40" rows="8"></textarea>
+                <br><br>
+                <label>
+                    <input type="radio" name="case" value="True" checked> Case Sensitive
+                </label>
+                <label>
+                    <input type="radio" name="case" value="False"> Case Insensitive
+                </label>
+                <br><br>
+                <label>
+                    <input type="radio" name="exact" value="True" checked> Match Exact Word
+                </label>
+                <label>
+                    <input type="radio" name="exact" value="False"> Not Match Exact Word
+                </label>
+                <br><br>
+                <label for="above">Num of lines <em>above</em> searched: </label>
+                <input id="above" type="number" name="above" value="1" max="10" min="1" size="2" />
+                <br><br>
+                <label for="below">Num of lines <em>below</em> searched: </label>
+                <input id="below" type="number" name="below" value="1" max="10" min="1" size="2" />
+                
+            </div>
+            
+            <div class="submitdiv">
+                <input type="submit" value="Search!">
+            </div>
+        </form>
+
+        <br>
+    </body>
+</html>
