@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+    <head>
+        <title>AutoSearch Toolkit</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body style="font-family: Arial, sans-serif;max-width: 1000px;margin: 0 auto;">
+        <h1 style="text-align: center;">Welcome to web auto-search toolkit:)</h1>
+        <p style="text-align: center;">
+        1. Deep link Search Tool will show all the sublinks in different categories
+        <br>
+        <br>
+        2. WebScrape & Search Word Tool will grab text from links and search keyword from text
+
+        </p>
+        <h2 class="bigh2"></h2>
+        
+        <div style="display: inline-block;height: 200px;width: 400px;margin: 20px;vertical-align: bottom;background-color: rgba(173, 173, 173, 0.125);padding: 10px;border: 2px solid blueviolet;">
+            <h2 class="title">Tool 1 <br>Search Deep Link Tool</h2>
+            <h2 class="bigh2"></h2>
+            <div style="display: flex;justify-content: center; align-items: center;"> 
+            <button type="button" ><a href="{{ url_for('deep_search') }}">Search Deep Link</a></button>
+            </div>
+        </div>
+        <div style="display: inline-block;height: 200px;width: 400px;margin: 20px;vertical-align: bottom;background-color: rgba(173, 173, 173, 0.125);padding: 10px;border: 2px solid blueviolet;">
+            <h2 class="title">Tool 2 <br>WebScrape & Search Word Tool</h2>
+            <h2 class="bigh2"></h2>
+            <div style="display: flex;justify-content: center;  align-self: center;"> 
+            <button type="button" ><a href="{{ url_for('link_to_text') }}">Search Link & Word</a></button>
+            </div>
+                    
+        </div>
+        
+    </body>
+</html>

@@ -4,7 +4,7 @@
     <title>Result</title>
     <link rel="stylesheet" href="../static/styles.css">
   </head>
-  <body>
+  <body class="pagebody">
     <br>
     {%if 'link'== source %}
     <div id="result">
@@ -16,6 +16,8 @@
       <button type = "button"><a href="{{ url_for('search_word') }}">Proceed to Search Word</a></button>
       <p>or</p>
       <button type = "button"><a href="{{ url_for('link_to_text') }}">Back to Search Link</a></button>
+      <p>or</p>
+      <button type = "button"><a href="{{ url_for('home') }}">Back to Home</a></button>
     </div>
   {% else %}
     <div id="result">
@@ -31,6 +33,8 @@
       <button type="button"><a href="{{ url_for('link_to_text') }}">Back to Search Link</a></button>
       <p>or</p>
       <button type="button"><a href="{{ url_for('search_word') }}">Back to Search Word</a></button>
+      <p>or</p>
+      <button type = "button"><a href="{{ url_for('home') }}">Back to Home</a></button>
     </div>
   {% endif %}
 </body>

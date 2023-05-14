@@ -1,5 +1,5 @@
 
-body {
+.pagebody {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -7,13 +7,13 @@ body {
 }
 
 .box {
-
-    height: 600px;
+    height: 570px;
     width: 400px;
     margin: 20px;
     vertical-align: bottom;
     background-color: rgba(173, 173, 173, 0.125);
     padding: 10px;
+    border: 2px solid blueviolet;
 }
 
 .bigh1 {

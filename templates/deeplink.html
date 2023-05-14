@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Search Link</title>
+    <title>Deep Search</title>
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 
@@ -11,16 +11,16 @@
 
     
 
-    <form action="/search_link" method="POST" enctype="multipart/form-data">
+    <form action="/deep_search" method="POST" enctype="multipart/form-data">
         
 
         <div class="box">
      
 
-        <h1 class="title">Provide links to search</h1>
+        <h1 class="title">Provide links to <em>DEEP</em> search</h1>
         <p> Choose one of the following:
         <br>
-        1. clicking choose file to upload link.txt 
+        1. clicking choose file to upload link.txt (Don't Upload a lot of links)
         <br>
         2. Directly paste link in text area,split by new line </p>
         <label for="linktxt"><b>Upload Link here:<b> </label>
@@ -30,6 +30,10 @@
         <label for="linkarea"> <b>Or Paste Link here:</b> </label>
         <br><br>
         <textarea name="linkarea" id="linkarea" cols="50" rows="10"></textarea>
+        <br><br>
+        <label for="level">Number of levels to search:</label>
+        <input id="level" type="number" name="level" value="1" max="3" min="1" size="2" />
+        
         <br><br>
         <label for="stimeout">Search Timeout: </label>
         <input id="stimeout" type="number" name="stimeout" value="15"  min="10" max="30" />
