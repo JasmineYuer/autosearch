@@ -42,12 +42,8 @@ def link_to_text():
     if request.method == "POST":
         linktxt = request.files["linktxt"]
         linkarea = request.form["linkarea"]
+        # assert check
         stimeout = int(request.form["stimeout"])
-        # assert (linktxt.filename == "") + (
-        #     linkarea == ""
-        # ) == 1, "Either upload or put some text"
-
-        print(linktxt, linkarea, stimeout)
         if linktxt and allowed_file(linktxt.filename):
             filename = secure_filename(linktxt.filename)
             linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
@@ -55,7 +51,11 @@ def link_to_text():
                 os.path.join(app.config["UPLOAD_FOLDER"], filename)
             )
         else:
-            link = [i.replace("\xa0", " ") for i in linkarea.split("\n") if i != ""]
+            link = [
+                i.replace("\xa0", " ").replace("\r", "")
+                for i in linkarea.split("\n")
+                if i != ""
+            ]
             print(link)
 
         file_lk_map, fail_map = pl.write_to_files(link, timeout=stimeout)
@@ -73,9 +73,9 @@ def link_to_text():
 def search_word():
     print(request.method)
     if request.method == "POST":
-        print(request.files, request.form)
         wordtxt = request.files["wordtxt"]
         wordarea = request.form["wordarea"]
+        # assert check needed
         if wordtxt and allowed_file(wordtxt.filename):
             filename = secure_filename(wordtxt.filename)
             wordtxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
@@ -86,7 +86,7 @@ def search_word():
             word = list(
                 set(
                     [
-                        i.replace("\xa0", " ").replace("\u202f", " ")
+                        i.replace("\xa0", " ").replace("\u202f", " ").replace("\r", "")
                         for i in wordarea.split("\n")
                     ]
                 )
@@ -144,4 +144,4 @@ def download_file(filename):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
