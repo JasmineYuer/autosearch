@@ -5,6 +5,7 @@ import shutil
 import time
 import requests
 import html2text
+from bs4 import BeautifulSoup
 from backend import utils
 from backend.pdf import process_pdf
 
@@ -22,17 +23,6 @@ def get_link_from_path(link_path):
 
     link = [i.replace("\xa0", " ") for i in link.split("\n") if i != ""]
     return link
-
-
-def create_result_folder():
-    try:
-        os.mkdir("result")
-        print("Current dir in : " + os.getcwd())
-    except:
-        shutil.rmtree("result")
-        print("Result folder exist, removed existing result folder")
-        os.mkdir("result")
-        print("Created result folder")
 
 
 def find_base_url(url):
@@ -116,7 +106,7 @@ def write_to_files(link_lst, timeout=30):
     fail_map = {}
     child_threads = []
 
-    utils.create_result_folder()
+    utils.create_result_folder("result")
     for index in range(1, len(link_lst) + 1):
         lk = link_lst[index - 1]
         file_name = f"./result/{index}.txt"
@@ -130,3 +120,80 @@ def write_to_files(link_lst, timeout=30):
     for t in child_threads:
         t.join()
     return file_lk_map, fail_map
+
+
+# func for deep search
+
+
+def find_base_url(url):
+    o = urlparse(url)
+    return o.scheme + "://" + o.netloc
+
+
+def is_same_domain(base, url):
+    try:
+        o1 = urlparse(base).netloc
+        o2 = urlparse(url).netloc
+        return o1 == o2
+    except:
+        print(f"Fail to compare {base} and {url}")
+        return False
+
+
+def url_deepdive(url, level, timeout=30):
+    base_url = find_base_url(url)
+    final_lst = set()
+    child_threads = []
+    fail_link = set()
+    irrelevant = set()
+    print(f"Parsing {url}... Tracing {level} level down...")
+
+    def get_all_url(url, level, timeout):
+        if level <= 0:
+            return
+        else:
+            level -= 1
+            try:
+                r = requests.get(url, headers=headers, timeout=timeout)
+                soup = BeautifulSoup(r.content, "html.parser")
+                s = soup.find_all("a")
+                s2 = [i.get("href").strip() for i in s if i.get("href")]
+                for ref in s2:
+                    # not parse external link and referral link
+                    if ref.startswith("/"):
+                        mutex.acquire()
+                        final_lst.add(urljoin(base_url, ref))
+                        mutex.release()
+                        t = Thread(
+                            target=get_all_url,
+                            args=([urljoin(base_url, ref), level, timeout]),
+                        )
+                        t.start()
+                        child_threads.append(t)
+                    elif is_same_domain(base_url, ref):
+                        mutex.acquire()
+                        final_lst.add(ref)
+                        mutex.release()
+                        t = Thread(
+                            target=get_all_url,
+                            args=([ref, level, timeout]),
+                        )
+                        t.start()
+                        child_threads.append(t)
+                    else:
+                        mutex.acquire()
+                        irrelevant.add(ref)
+                        mutex.release()
+
+            except Exception as e:
+                print(e)
+                mutex.acquire()
+                fail_link.add(url)
+                mutex.release()
+
+    get_all_url(url, level, timeout)
+    s = time.time()
+    for t in child_threads:
+        t.join()
+    print(f"Grabbed {len(final_lst)} unique links in {round(time.time()-s,2)} seconds")
+    return list(final_lst), list(fail_link), list(irrelevant)

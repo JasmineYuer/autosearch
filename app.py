@@ -32,8 +32,52 @@ def home():
     return render_template("home.html")
 
 
+# additional variable
+# log system
+# dev and prod pod
 @app.route("/deep_search", methods=["GET", "POST"])
 def deep_search():
+    if request.method == "POST":
+        linktxt = request.files["linktxt"]
+        linkarea = request.form["linkarea"]
+        # assert check
+        stimeout = int(request.form["stimeout"])
+        level = int(request.form["level"])
+        if linktxt and allowed_file(linktxt.filename):
+            filename = secure_filename(linktxt.filename)
+            linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            link = pl.get_link_from_path(
+                os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            )
+        else:
+            link = [
+                i.replace("\xa0", " ").replace("\r", "")
+                for i in linkarea.split("\n")
+                if i != ""
+            ]
+        final_link = []
+        fail_link = []
+        irr_link = []
+        utils.create_result_folder("deep_link")
+
+        for url in link:
+            lks, fail_lks, irr_lks = pl.url_deepdive(url, level, stimeout)
+            final_link += lks
+            fail_link += fail_lks
+            irr_link += irr_lks
+        with open("./deep_link/deeplink.txt", "w", encoding="utf-8") as f:
+            txt = "\n".join(final_link)
+            f.write(txt)
+        with open("./deep_link/deeplink_fail.txt", "w", encoding="utf-8") as f:
+            txt = "\n".join(fail_link)
+            f.write(txt)
+        with open("./deep_link/deeplink_irrelevant.txt", "w", encoding="utf-8") as f:
+            txt = "\n".join(irr_link)
+            f.write(txt)
+        utils.zip_txt_files("deep_link", "deep_search.zip")
+        session["source"] = "deep_link"
+        session["filename"] = {"deep_search": "deep_search.zip"}
+        return redirect("/result")
     return render_template("deeplink.html")
 
 
@@ -62,7 +106,7 @@ def link_to_text():
         session["file_lk_map"] = file_lk_map
         session["fail_map"] = fail_map
         session["link"] = link
-        utils.zip_files()
+        utils.zip_txt_files("result", "link_result.zip")
         session["filename"] = {"link": "link_result.zip"}
         session["source"] = "link"
         return redirect("/result")
@@ -133,6 +177,10 @@ def search_word():
 
 @app.route("/result")
 def result_page():
+    if session["source"] == "deep_link":
+        session["folder"] = "deep_link"
+    else:
+        session["folder"] = "result"
     return render_template(
         "result.html", filename=session["filename"], source=session["source"]
     )
@@ -140,7 +188,8 @@ def result_page():
 
 @app.route("/download/<filename>")
 def download_file(filename):
-    return send_from_directory("./result", filename)
+    folder = session["folder"]
+    return send_from_directory(f"./{folder}", filename)
 
 
 if __name__ == "__main__":

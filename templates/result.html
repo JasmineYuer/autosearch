@@ -19,7 +19,7 @@
       <p>or</p>
       <button type = "button"><a href="{{ url_for('home') }}">Back to Home</a></button>
     </div>
-  {% else %}
+  {% elif 'word' == source %}
     <div id="result">
       <h3>Finish searching keyword!</h3>
       <a href="{{ url_for('download_file', filename=filename['link']) }}" download="{{ filename['link'] }}">
@@ -33,6 +33,17 @@
       <button type="button"><a href="{{ url_for('link_to_text') }}">Back to Search Link</a></button>
       <p>or</p>
       <button type="button"><a href="{{ url_for('search_word') }}">Back to Search Word</a></button>
+      <p>or</p>
+      <button type = "button"><a href="{{ url_for('home') }}">Back to Home</a></button>
+    </div>
+  {% else %}
+      <div id="result">
+      <h3>Finish deep search!</h3>
+      <a href="{{ url_for('download_file', filename=filename['deep_search'] ) }}" download="{{ filename['deep_search'] }}">
+        <button type = "button">Download Link list</button>
+      </a>
+      <p>or</p>
+      <button type="button"><a href="{{ url_for('link_to_text') }}">Proceed to Search Link Content</a></button>
       <p>or</p>
       <button type = "button"><a href="{{ url_for('home') }}">Back to Home</a></button>
     </div>
