@@ -4,6 +4,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 import os, zipfile, shutil, pickle
+from urllib.parse import urlparse
 
 
 def df_to_xlsx(df, name):
@@ -83,3 +84,11 @@ def back_search(dictionary):
         else:
             reverse[v].append(k)
     return reverse
+
+
+def is_weblink(s):
+    try:
+        result = urlparse(s)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False

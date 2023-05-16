@@ -160,17 +160,12 @@ def url_deepdive(url, level, timeout=30):
                 s2 = [i.get("href").strip() for i in s if i.get("href")]
                 for ref in s2:
                     # not parse external link and referral link
-                    if ref.startswith("/") or ref.startswith("./"):
+                    # if ref.startswith("/") or ref.startswith("./"):
+                    if not is_same_domain(base_url, ref) and utils.is_weblink(ref):
                         mutex.acquire()
-                        final_lst.add(urljoin(base_url, ref))
+                        irrelevant.add(ref)
                         mutex.release()
-                        t = Thread(
-                            target=get_all_url,
-                            args=([urljoin(base_url, ref), level, timeout]),
-                        )
-                        t.start()
-                        child_threads.append(t)
-                    elif is_same_domain(base_url, ref):
+                    elif utils.is_weblink(ref):
                         mutex.acquire()
                         final_lst.add(ref)
                         mutex.release()
@@ -182,8 +177,14 @@ def url_deepdive(url, level, timeout=30):
                         child_threads.append(t)
                     else:
                         mutex.acquire()
-                        irrelevant.add(ref)
+                        final_lst.add(urljoin(base_url, ref))
                         mutex.release()
+                        t = Thread(
+                            target=get_all_url,
+                            args=([urljoin(base_url, ref), level, timeout]),
+                        )
+                        t.start()
+                        child_threads.append(t)
 
             except Exception as e:
                 print(e)
