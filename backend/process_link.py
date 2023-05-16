@@ -160,7 +160,7 @@ def url_deepdive(url, level, timeout=30):
                 s2 = [i.get("href").strip() for i in s if i.get("href")]
                 for ref in s2:
                     # not parse external link and referral link
-                    if ref.startswith("/"):
+                    if ref.startswith("/") or ref.startswith("./"):
                         mutex.acquire()
                         final_lst.add(urljoin(base_url, ref))
                         mutex.release()
