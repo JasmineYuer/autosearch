@@ -29,6 +29,7 @@ def allowed_file(filename):
 
 @app.route("/")
 def home():
+    utils.create_result_folder("pickles")
     return render_template("home.html")
 
 
@@ -84,6 +85,7 @@ def deep_search():
 @app.route("/search_link", methods=["GET", "POST"])
 def link_to_text():
     if request.method == "POST":
+        session["source"] = "link"
         linktxt = request.files["linktxt"]
         linkarea = request.form["linkarea"]
         # assert check
@@ -103,12 +105,12 @@ def link_to_text():
             print(link)
 
         file_lk_map, fail_map = pl.write_to_files(link, timeout=stimeout)
-        session["file_lk_map"] = file_lk_map
-        session["fail_map"] = fail_map
-        session["link"] = link
+        utils.store_var(file_lk_map, "file_lk_map")
+        utils.store_var(fail_map, "fail_map")
+        utils.store_var(link, "link")
+
         utils.zip_txt_files("result", "link_result.zip")
         session["filename"] = {"link": "link_result.zip"}
-        session["source"] = "link"
         return redirect("/result")
     return render_template("link.html")
 
@@ -140,9 +142,11 @@ def search_word():
         above = int(request.form["above"])
         below = int(request.form["below"])
 
-        file_lk_map = session["file_lk_map"]
-        fail_map = session["fail_map"]
-        link = session["link"]
+        file_lk_map = utils.get_var("file_lk_map")
+        file_lk_map_reverse = utils.back_search(file_lk_map)
+        fail_map = utils.get_var("fail_map")
+        link = utils.get_var("link")
+        print(file_lk_map_reverse)
         final, lk_no_hit = pw.run_search(
             file_lk_map,
             word,
@@ -158,12 +162,12 @@ def search_word():
         summary = []
         for l in link:
             if l in fail_map:
-                summary.append([l, fail_map[l]])
+                summary.append([l, fail_map[l], None])
             elif l in lk_no_hit:
-                summary.append([l, "no hit"])
+                summary.append([l, "no hit", file_lk_map_reverse[l]])
             else:
-                summary.append([l, "hit"])
-        summary = pd.DataFrame(summary, columns=["Link", "Result"])
+                summary.append([l, "hit", file_lk_map_reverse[l]])
+        summary = pd.DataFrame(summary, columns=["Link", "Result", "File"])
         with pd.ExcelWriter(
             "./result/result.xlsx", engine="openpyxl", mode="a"
         ) as writer:
@@ -177,6 +181,7 @@ def search_word():
 
 @app.route("/result")
 def result_page():
+    print(session["source"])
     if session["source"] == "deep_link":
         session["folder"] = "deep_link"
     else:

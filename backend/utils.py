@@ -3,7 +3,7 @@ from openpyxl.styles import Alignment
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-import os, zipfile, shutil
+import os, zipfile, shutil, pickle
 
 
 def df_to_xlsx(df, name):
@@ -60,3 +60,26 @@ def zip_txt_files(folder, zfile):
             if file.endswith(".txt"):
                 path = os.path.join(folder, file)
                 zf.write(path)
+
+
+def store_var(dictionary, file_name):
+    path = os.path.join("pickles", file_name)
+    with open(path, "wb") as f:
+        pickle.dump(dictionary, f)
+
+
+def get_var(file_name):
+    path = os.path.join("pickles", file_name)
+    with open(path, "rb") as f:
+        loaded_dict = pickle.load(f)
+    return loaded_dict
+
+
+def back_search(dictionary):
+    reverse = {}
+    for k, v in dictionary.items():
+        if v not in reverse:
+            reverse[v] = k
+        else:
+            reverse[v].append(k)
+    return reverse
