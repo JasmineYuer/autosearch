@@ -33,8 +33,9 @@ clean:
 	rm -rf docs/_build
 	rm -rf .coverage
 	rm -rf .ipynb_checkpoint
+	rm -rf __pycache__
 	rm -f testresults.xml
-
+	rm -rf result deep_link pickles
 
 
 # Install python requirements (see setup.cfg)
