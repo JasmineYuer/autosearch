@@ -86,9 +86,23 @@ def back_search(dictionary):
     return reverse
 
 
+def split_list(lst, num):
+    # This will split list 'lst' into chunks of size 'num'
+    chunks = []
+    for i in range(0, len(lst), num):
+        chunk = lst[i : i + num]
+        chunks.append(chunk)
+    return chunks
+
+
 def is_weblink(s):
     try:
         result = urlparse(s)
         return all([result.scheme, result.netloc])
     except ValueError:
         return False
+
+
+def uniform_link(ref):
+    u = urlparse(ref)
+    return u.scheme + "://" + u.netloc + u.path

@@ -37,6 +37,7 @@ def lk_to_file(lk, fail_map, file_name, file_lk_map, timeout):
 
     if lk.lower().endswith(".pdf"):
         txt = process_pdf(lk)
+        print(txt)
         if txt:
             with open(file_name, "w", encoding="utf-8") as f:
                 f.write(txt)
@@ -160,11 +161,19 @@ def url_deepdive(url, level, timeout=30):
                 s2 = [i.get("href").strip() for i in s if i.get("href")]
                 for ref in s2:
                     # not parse external link and referral link
-                    # if ref.startswith("/") or ref.startswith("./"):
                     if not is_same_domain(base_url, ref) and utils.is_weblink(ref):
                         mutex.acquire()
                         irrelevant.add(ref)
                         mutex.release()
+                    # not path href with following start or end
+                    elif (
+                        ref.startswith("#")
+                        or ref.lower().endswith(".jpg")
+                        or ref.lower().endswith(".png")
+                        or ref.lower().startswith("mailto")
+                    ):
+                        irrelevant.add(ref)
+                    # complete link
                     elif utils.is_weblink(ref):
                         mutex.acquire()
                         final_lst.add(ref)
@@ -175,6 +184,7 @@ def url_deepdive(url, level, timeout=30):
                         )
                         t.start()
                         child_threads.append(t)
+                    # href with relative path
                     else:
                         mutex.acquire()
                         final_lst.add(urljoin(base_url, ref))
@@ -196,5 +206,7 @@ def url_deepdive(url, level, timeout=30):
     s = time.time()
     for t in child_threads:
         t.join()
-    print(f"Grabbed {len(final_lst)} unique links in {round(time.time()-s,2)} seconds")
+    print(
+        f"Visted {len(child_threads)+1} links. Grabbed {len(final_lst)} unique links in {round(time.time()-s,2)} seconds"
+    )
     return list(final_lst), list(fail_link), list(irrelevant)

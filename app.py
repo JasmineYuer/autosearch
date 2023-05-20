@@ -44,6 +44,8 @@ def deep_search():
         # assert check
         stimeout = int(request.form["stimeout"])
         level = int(request.form["level"])
+        chunk = int(request.form["chunks"])
+
         if linktxt and allowed_file(linktxt.filename):
             filename = secure_filename(linktxt.filename)
             linktxt.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
@@ -66,7 +68,16 @@ def deep_search():
             final_link += lks
             fail_link += fail_lks
             irr_link += irr_lks
-        with open("./deep_link/deeplink.txt", "w", encoding="utf-8") as f:
+
+        # ignore param, query, fragments
+        final_link = list(set(map(lambda x: utils.uniform_link(x), final_link)))
+
+        final_link_chunk = utils.split_list(final_link, chunk)
+        for i in range(len(final_link_chunk)):
+            with open(f"./deep_link/deeplink_{i+1}.txt", "w", encoding="utf-8") as f:
+                txt = "\n".join(final_link_chunk[i])
+                f.write(txt)
+        with open("./deep_link/deeplink_all.txt", "w", encoding="utf-8") as f:
             txt = "\n".join(final_link)
             f.write(txt)
         with open("./deep_link/deeplink_fail.txt", "w", encoding="utf-8") as f:
