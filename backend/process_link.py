@@ -171,6 +171,7 @@ def url_deepdive(url, level, timeout=30):
                         or ref.lower().endswith(".jpg")
                         or ref.lower().endswith(".png")
                         or ref.lower().startswith("mailto")
+                        or ref.lower().startswith("tel://")
                     ):
                         irrelevant.add(ref)
                     # complete link
